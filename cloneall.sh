@@ -8,6 +8,9 @@ pkg=$2
 if [ -e $pkg ]; then
   cd $pkg
   echo "$pkg $(git pull)"
+#  owner=$(basename $(dirname $url))
+#  curl -s -H "Authorization: token $(cat ../../token)" \
+#    -d '' https://api.github.com/repos/$owner/$pkg.jl/forks > /dev/null
   cd ..
 else
   echo "$pkg $(git clone -q $url $pkg)"
