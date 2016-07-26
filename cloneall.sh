@@ -11,6 +11,7 @@ if [ -e $pkg ]; then
 #  owner=$(basename $(dirname $url))
 #  curl -s -H "Authorization: token $(cat ../../token)" \
 #    -d '' https://api.github.com/repos/$owner/$pkg.jl/forks > /dev/null
+#  git remote add mine https://${USER}@github.com/$USER/$pkg.jl || true
   cd ..
 else
   echo "$pkg $(git clone -q $url $pkg)"
