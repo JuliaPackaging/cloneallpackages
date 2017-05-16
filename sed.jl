@@ -18,7 +18,7 @@ function translate_status_url(base, arch)
     end
 end
 
-  
+
 
 function build_julia_url(bucket, uri)
     # We're aliasing the "julianightlies" bucket to the new "julialangnightlies" name
@@ -29,6 +29,9 @@ function build_julia_url(bucket, uri)
     return "https://$(bucket)-s3.julialang.org/$(uri)"
 end
 
+# Magic incantation to get TLS 1.2 on Powershell
+const ps_tls = "[System.Net.ServicePointManager]::SecurityProtocol = [System.Net.SecurityProtocolType]::Tls12"
+
 function translate_path(appveyor_path)
     if isfile(appveyor_path)
         lines = readlines(appveyor_path)
@@ -38,7 +41,7 @@ function translate_path(appveyor_path)
         for idx in 1:length(lines)
             # First, search for JULIAVERSION definition
             m = match(r"(\s*-?\s+)JULIA[^ )]+:\s+\"(.*?)/(.*)\"", lines[idx])
- 
+
             if m != nothing
                 if m.captures[2] in ["stable", "download"] && m.captures[3] in ["win32", "win64"]
                     juliaurl = translate_status_url(m.captures[2], m.captures[3])
@@ -74,7 +77,32 @@ function translate_path(appveyor_path)
             warn("$(appveyor_path) didn't conform to our search pattern properly!")
             return
         end
-        
+
+        # Finally, if we haven't yet, switch over to TLS 1.2 for our web clients
+        if all(isempty(search(l, ps_tls)) for l in lines)
+            # Find the `install:` line
+            install_idx = findfirst([ismatch(r"^install:\s*", l) for l in lines])
+            if install_idx == 0
+                warn("$(appveyor_path) could not auto-detect post-install: whitespace")
+                return
+            end
+
+            # Get the spacing for the next line
+            cmd_idx = install_idx
+            m = nothing
+            while m == nothing
+                cmd_idx += 1
+                if cmd_idx > length(lines)
+                    warn("$(appveyor_path) could not auto-detect post-install: whitespace")
+                    return
+                end
+                m = match(r"^\s+-\s*", lines[cmd_idx])
+            end
+
+            # Insert our powershell tls line just after `install:`
+            insert!(lines, install_idx + 1, "$(m.match)ps: \"$(ps_tls)\"\n")
+        end
+
         println("Writing out $appveyor_path")
         open(appveyor_path, "w") do f
             write(f, join(lines, ""))
@@ -86,7 +114,7 @@ for path in readdir(".")
     if !isdir(path)
         continue
     end
-    
+
     translate_path(joinpath(path, "appveyor.yml"))
     translate_path(joinpath(path, ".appveyor.yml"))
 end

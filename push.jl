@@ -1,7 +1,7 @@
 # This file pushes local changes to the branch name of your choice
 branch_name = "ci_url"
 
-for path in reverse(readdir("."))
+for path in readdir(".")
     if !isdir(path)
         continue
     end
