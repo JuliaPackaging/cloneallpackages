@@ -33,8 +33,6 @@ for (i, p) in enumerate(allnames)
         pkgs[i].travisyml = yml
         if haskey(yml, "language")
             pkgs[i].language = yml["language"]
-        else
-            pkgs[i].language = ""
         end
         pkgs[i].usesppa = contains(ymlstring, "ppa:staticfloat")
     end

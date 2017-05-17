@@ -8,13 +8,15 @@ pkg=$2
 if [ -e $pkg ]; then
   cd $pkg
   echo "$pkg $(git pull)"
+  cd ..
+else
+  echo "$pkg $(git clone -q $url $pkg)"
+  cd $pkg
 #  owner=$(basename $(dirname $url))
 #  curl -s -H "Authorization: token $(cat ../../token)" \
 #    -d '' https://api.github.com/repos/$owner/$pkg.jl/forks > /dev/null
 #  git remote add mine https://${USER}@github.com/$USER/$pkg.jl || true
   cd ..
-else
-  echo "$pkg $(git clone -q $url $pkg)"
 fi
 }
 clone_or_pull https://github.com/JuliaLang/METADATA.jl METADATA
