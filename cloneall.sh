@@ -24,6 +24,8 @@ for urlfile in $(ls METADATA/*/url); do
   clone_or_pull $(cat $urlfile) $(basename $(dirname $urlfile))
 done
 
+echo
+echo
 for urlfile in $(ls METADATA/*/url); do
   pkg=$(basename $(dirname $urlfile))
   cd $pkg
