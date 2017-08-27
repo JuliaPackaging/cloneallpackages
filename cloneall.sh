@@ -23,3 +23,10 @@ clone_or_pull https://github.com/JuliaLang/METADATA.jl METADATA
 for urlfile in $(ls METADATA/*/url); do
   clone_or_pull $(cat $urlfile) $(basename $(dirname $urlfile))
 done
+
+for urlfile in $(ls METADATA/*/url); do
+  pkg=$(basename $(dirname $urlfile))
+  cd $pkg
+  git status | grep -q "up-to-date" || echo "$pkg not up-to-date"
+  cd ..
+done
