@@ -29,6 +29,6 @@ echo
 for urlfile in $(ls METADATA/*/url); do
   pkg=$(basename $(dirname $urlfile))
   cd $pkg
-  git status | grep -q "up-to-date" || echo "$pkg not up-to-date"
+  git status | grep -q "up[- ]to[- ]date" || echo "$pkg not up to date"
   cd ..
 done
